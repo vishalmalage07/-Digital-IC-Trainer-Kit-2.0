@@ -37,7 +37,7 @@
     <img src="https://img.shields.io/badge/🚀_LAUNCH_VIRTUAL_LAB-LIVE_DEMO-2ea44f?style=for-the-badge&logo=github" alt="Live Demo" height="45"/>
   </a>
   <br>
-  <b>🌐 Try it now in your browser:</b> <a href="https://vishalmalage07.github.io/-Digital-IC-Trainer-Kit-2.0/" target="_blank">https://vishalmalage07.github.io/-Digital-IC-Trainer-Kit-2.0/</a>
+  <h3><b>🌐 Try it now in your browser:</b> <a href="https://vishalmalage07.github.io/-Digital-IC-Trainer-Kit-2.0/" target="_blank">Digital-IC-Trainer-Kit-2.0</a></h3>
   <br>
 </p>
 
