@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital IC Trainer kit By Vishal Malage</title>
+<link rel="shortcut icon" type="image/icon" href="logo.png"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html, body {width:100%; height:100%; overflow:hidden;}
+body{
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1a2a6c 100%);
+  font-family:'Courier New',monospace;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* ── toolbar ── <!--It's Officially Design & Developed  By Vishal Malage-->*/
+#toolbar{
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding:6px 12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  z-index:100;
+  min-height:48px;
+  width:100%;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+#toolbar select,#toolbar input{
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius:6px;
+  padding:4px 8px;
+  font-family:'Courier New',monospace;
+  font-size:12px;
+  outline: none;
+  backdrop-filter: blur(5px);
+}
+#toolbar select option {
+  background: #1e3c72;
+  color: #fff;
+}
+.tbtn{
+  background: rgba(12, 165, 215, 0.75);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius:6px;
+  padding:5px 10px;
+  font-family:'Courier New',monospace;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  white-space:nowrap;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+.tbtn:hover{background: rgba(12, 165, 215, 0.95); box-shadow: 0 0 10px rgba(12, 165, 215, 0.5);}
+.tbtn.red{background: rgba(246, 78, 77, 0.75); color:#fff;}
+.tbtn.red:hover{background: rgba(246, 78, 77, 0.95); box-shadow: 0 0 10px rgba(246, 78, 77, 0.5);}
+.tbtn.green{background: rgba(46, 204, 113, 0.75); color:#fff;}
+.tbtn.green:hover{background: rgba(46, 204, 113, 0.95); box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);}
+.tbtn.yellow{background: rgba(241, 196, 15, 0.75); color:#fff;}
+.tbtn.yellow:hover{background: rgba(241, 196, 15, 0.95); box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);}
+.tbtn.active{background:#ff9f1c;color:#111;box-shadow:0 0 0 2px #fff3 inset,0 0 10px #ff9f1c77;}
+#undoBtn:hover:not([disabled]){background: rgba(108, 92, 231, 0.95) !important;}
+#statusBar{
+  margin-left:auto;
+  color: #e0e0e0;
+  font-size:11px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius:6px;
+  padding:4px 10px;
+  max-width:120px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  backdrop-filter: blur(5px);
+}
+#zoomLabel{color:#eee;font-size:11px;min-width:40px;text-align:center;}
+#pwrBtn{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ccc;
+  font-size:18px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s;
+  flex-shrink:0;
+  backdrop-filter: blur(5px);
+}
+#pwrBtn.on{background: rgba(246, 78, 77, 0.85); border-color:#f64e4d; color:#fff; box-shadow:0 0 12px rgba(246, 78, 77, 0.8);}
+
+/* ── canvas area ── Design & Developed  By Vishal Malage*/
+#canvasWrap{
+  flex:1;
+  width:100%;
+  position:relative;
+  overflow:hidden;
+  cursor:default;
+  background: transparent;
+}
+#wireCanvas{
+  position:absolute;
+  top:0;
+  left:0;
+  pointer-events:none;
+  z-index:10;
+  width:100%;
+  height:100%;
+}
+#boardWorld{
+  position:absolute;
+  top:0;
+  left:0;
+  transform-origin:0 0;
+  padding:15px;
+}
+ 
+/* ── board sections ── Design & Developed  By Vishal Malage */
+#board{
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius:12px;
+  padding:12px;
+  min-width:30px;
+  max-width:100%;
+  position:relative;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  display:flex;
+  flex-direction:column;
+  gap:02px;
+}
+.sec-label{
+  color:#ffffff;
+  font-size:12px;
+  font-weight:bold;
+  text-align:center;
+  padding:2px;
+  letter-spacing:2px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+}
+.board-strip{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius:8px;
+  backdrop-filter: blur(8px);
+  flex-wrap:wrap;
+}
+
+/* ── pin column ── Design & Developed  By Vishal Malage*/
+.pcol{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:32px;}
+.pin-lbl{font-size:9px;color:#ffffff;text-align:center;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,0.6);}
+.led{width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.2);transition:background .1s;}
+.led.hi{background:#ff2222;border-color:#f008;box-shadow:0 0 8px #ff2222;}
+.out-col{min-width:44px;gap:3px;}
+.out-bulb-wrap{display:flex;flex-direction:column;align-items:center;gap:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));}
+.out-bulb{
+  width:26px;height:26px;border-radius:50% 50% 46% 46%;
+  background:radial-gradient(circle at 35% 30%, #fff9d6 0%, #998d65 20%, #4f5764 58%, #27303d 100%);
+  border:2px solid rgba(255,255,255,0.3);
+  position:relative;
+  box-shadow:inset 0 -6px 10px #0005,inset 0 6px 12px #ffffff18;
+  transition:all .18s ease;
+}
+.out-bulb::before{
+  content:'';
+  position:absolute;
+  width:7px;height:7px;border-radius:50%;
+  left:5px;top:4px;
+  background:#ffffff55;
+  filter:blur(.4px);
+}
+.out-bulb::after{
+  content:'';
+  position:absolute;
+  left:50%;bottom:3px;transform:translateX(-50%);
+  width:8px;height:6px;
+  border-radius:3px;
+  background:linear-gradient(180deg,#ffe9a4,#7f6a39);
+  opacity:.35;
+}
+.out-bulb.live{
+  background:radial-gradient(circle at 35% 30%, #fbfbfb 0%, #bac1cc 22%, #58606d 60%, #2b3240 100%);
+  border-color:#eef3ff88;
+}
+.out-bulb.on{
+  background:radial-gradient(circle at 38% 28%, #fffef2 0%, #fff6a0 18%, #ffd33d 38%, #ff9f1c 66%, #7f3d00 100%);
+  border-color:#fff2b0;
+  box-shadow:0 0 12px #ffd75b,0 0 26px #ffb000cc,0 0 48px #ff7b00aa,inset 0 -6px 10px #9f4d0018,inset 0 6px 12px #ffffff66;
+}
+.bulb-base{
+  width:16px;height:8px;border-radius:0 0 5px 5px;
+  background:linear-gradient(180deg,#d9dde2,#6e7682);
+  border:1px solid #4e5561;
+  margin-top:-2px;
+  position:relative;
+}
+.bulb-base::before{
+  content:'';
+  position:absolute;
+  left:2px;right:2px;top:2px;height:1px;
+  background:#49505c;
+  box-shadow:0 2px 0 #49505c,0 4px 0 #49505c;
+}
+.out-note{
+  font-size:8px;
+  font-weight:bold;
+  color:#e0e0e0;
+  letter-spacing:.5px;
+  min-height:10px;
+}
+.out-note.live{color:#00ffff;}
+.out-note.on{color:#ffd700;text-shadow:0 0 10px #fff0a0;}
+.pin-stub{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.6);cursor:crosshair;transition:all .1s;position:relative;z-index:30;}
+.pin-stub:hover,.pin-stub.hover{background:#ffe033;transform:scale(1.5);}
+.pin-stub.connected{background:#ffd700;}
+.pin-stub.dragging-src{background:#00e5ff;transform:scale(1.6);}
+.toggle-sw{width:14px;height:24px;background:rgba(0,0,0,0.5);border-radius:6px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;position:relative;transition:background .1s;}
+.toggle-sw::after{content:'';position:absolute;width:12px;height:12px;background:#ccc;border-radius:50%;left:0;bottom:0;transition:bottom .15s;}
+.toggle-sw.hi{background:rgba(204,34,34,0.8);}
+.toggle-sw.hi::after{bottom:10px;background:#fff;}
+
+/* ── 7-Segment Display Section ── */
+.seg7-wrap{display:flex;align-items:center;gap:10px;background:rgba(0, 0, 0, 0.3);border:1px solid rgba(255, 255, 255, 0.2);padding:6px 10px;border-radius:8px;backdrop-filter:blur(5px);flex-wrap:wrap;}
+.seg7-box{position:relative;width:38px;height:58px;background:rgba(0, 0, 0, 0.5);border:1px solid rgba(255, 255, 255, 0.15);border-radius:4px;padding:3px;}
+.seg7-svg{width:100%;height:100%;}
+.seg7-svg polygon,.seg7-svg circle{fill:rgba(255, 255, 255, 0.1);transition:fill .1s;}
+.seg7-svg .on{fill:#ff2222;filter:drop-shadow(0 0 4px #ff2222);}
+.seg7-pins{display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+
+/* ── clock generator By Vishal Malage── +*/
+#clkSection{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius:8px;
+  backdrop-filter: blur(8px);
+  flex-wrap:wrap;
+}
+.clk-col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:38px;}
+.clk-lbl{font-size:9px;color:#2ecc71;font-weight:bold;letter-spacing:.5px;}
+.clk-indicator{width:11px;height:11px;border-radius:50%;background:rgba(0,0,0,0.4);border:2px solid rgba(255,255,255,0.2);transition:background .05s;}
+.clk-indicator.hi{background:#2ecc71;border-color:#2ecc7188;box-shadow:0 0 8px #2ecc71;}
+#clkFreqLabel{color:#2ecc71;font-size:10px;min-width:45px;text-align:center;}
+#clkFreqSlider{width:80px;accent-color:#2ecc71;}
+#clkRunBtn{background:rgba(46, 204, 113, 0.8);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:4px;padding:4px 8px;font-family:'Courier New',monospace;font-size:11px;font-weight:bold;cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);}
+#clkRunBtn:hover{background:rgba(46, 204, 113, 1);}
+#clkRunBtn.running{background:rgba(231, 76, 60, 0.8);color:#fff;}
+#clkRunBtn.running:hover{background:rgba(231, 76, 60, 1);}
+.clk-section-title{color:#2ecc71;font-size:11px;font-weight:bold;letter-spacing:1px;}
+.clk-pulse-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0, 0, 0, 0.3);border:2px solid #2ecc71;
+  color:#2ecc71;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .05s;user-select:none;
+}
+.clk-pulse-btn:active,.clk-pulse-btn.pressed{
+  background:#2ecc71;color:#0f0f1a;
+  box-shadow:0 0 10px #2ecc7188;
+  transform:scale(0.93);
+}
+
+/* ── IC area Disigned By Vishal Malage── */
+#icArea{
+  display:flex;gap:16px;padding:12px;flex-wrap:wrap;align-items:flex-start;min-height:180px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius:8px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── IC chip ── Design & Developed  By Vishal Malage */
+.ic-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center;margin:4px;}
+.ic-del{position:absolute;top:-8px;right:-8px;background:#f64e4d;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:40;opacity:0;transition:opacity .1s;}
+.ic-wrap:hover .ic-del{opacity:1;}
+.ic-notch{width:16px;height:6px;background:rgba(0,0,0,0.6);border-radius:0 0 8px 8px;}
+.ic-chip{display:flex;align-items:stretch;}
+.ic-sidebar{width:8px;background:rgba(20,20,20,0.8);border-radius:3px;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;}
+.ic-sidebar .h{width:5px;height:5px;background:#555;border-radius:50%;}
+.ic-body{background:rgba(15,15,15,0.85);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.1);min-width:65px;display:flex;align-items:center;justify-content:center;padding:4px 2px;border-radius:2px;}
+.ic-lbl{color:#0ca5d7;font-size:9px;font-weight:bold;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:1px;padding:2px;text-shadow:0 0 6px #0ca5d788;}
+.ic-col-l,.ic-col-r{display:flex;flex-direction:column;}
+.ic-pin-row{display:flex;align-items:center;height:18px;}
+.ic-pin-row.r{flex-direction:row-reverse;}
+.pn{font-size:8px;color:#aaa;width:12px;text-align:right;line-height:1;}
+.pn.r{text-align:left;}
+.ic-ps{margin:0 2px;}
+
+
+
+/* ── context menu ── */
+#ctxMenu{
+  position:absolute;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius:8px;
+  padding:4px 0;
+  z-index:200;
+  display:none;
+  min-width:130px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+#ctxMenu .ci{padding:6px 12px;color:#fff;font-size:11px;cursor:pointer;}
+#ctxMenu .ci:hover{background:rgba(255,255,255,0.2);color:#fff;}
+#ctxMenu .ci.danger{color:#ff6b6b;}
+#ctxMenu .ci.danger:hover{background:rgba(246, 78, 77, 0.3);}
+
+/* ── footer ── */
+.footer-copyright {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  color: #ccc;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+.footer-copyright a { color: #64ffda; text-decoration: none; }
+.footer-copyright a:hover { text-decoration: underline; }
+
+/* ── responsive breakpoints ── Design & Developed  By Vishal Malage */
+@media (max-width: 768px) {
+  #statusBar { display: none; }
+ 
+  #toolbar { padding: 4px 8px; gap: 4px; }
+  .tbtn { padding: 4px 6px; font-size: 10px; }
+  #icSel { font-size: 11px; max-width: 130px; }
+}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <select id="icSel">
+    
+      <option value="7400">7400 — Quad 2-Input NAND</option>
+      <option value="7402">7402 — Quad 2-Input NOR</option>
+      <option value="7404">7404 — Hex Inverter (NOT)</option>
+      <option value="7408">7408 — Quad 2-Input AND</option>
+      <option value="7410">7410 — Triple 3-Input NAND</option>
+      <option value="7411">7411 — Triple 3-Input AND</option>
+      <option value="7432">7432 — Quad 2-Input OR</option>
+      <option value="7447">7447 — BCD to 7-Seg Decoder (Active LOW)</option>
+      <option value="7448">7448 — BCD to 7-Seg Decoder (Active HIGH)</option>
+      <option value="7473">7473 — Dual JK Flip-Flop</option>
+      <option value="7474">7474 — Dual D-Type Flip-Flop</option>
+      <option value="7476">7476 — Dual JK Flip-Flop</option>
+      <option value="7483">7483 — 4-bit Binary Full Adder</option>
+      <option value="7485">7485 — 4-bit Magnitude Comparator</option>
+      <option value="7486">7486 — Quad 2-Input XOR</option>
+      <option value="7490">7490 — Decade / Mod-10 Counter</option>
+      <option value="7493">7493 — 4-bit Binary Ripple Counter</option>
+      <option value="74107">74107 — Dual JK Flip-Flop</option>
+      <option value="74138">74138 — 1:8 Demultiplexer / Decoder</option>
+      <option value="74139">74139 — Dual 1:4 Demultiplexer</option>
+      <option value="74151">74151 — 8-to-1 Multiplexer</option>
+      <option value="74153">74153 — Dual 4-to-1 Multiplexer</option>
+      <option value="74157">74157 — Quad 2-to-1 Multiplexer</option>
+      <option value="74164">74164 — 8-Bit SIPO Shift Register</option>
+      <option value="74194">74194 — 4-bit Universal Shift Register</option>
+      <option value="74195">74195 — 4-bit Parallel Shift Register</option>
+      <option value="74266">74266 — Quad 2-Input XNOR</option>
+    
+      <option value="CD4001">CD4001 — Quad 2-Input NOR</option>
+      <option value="CD4011">CD4011 — Quad 2-Input NAND</option>
+      <option value="CD4013">CD4013 — Dual D-Type Flip-Flop</option>
+      <option value="CD4017">CD4017 — Decade Counter / Divider</option>
+      <option value="CD4027">CD4027 — Dual JK Flip-Flop</option>
+      <option value="CD4051">CD4051 — 8-Channel MUX/DEMUX</option>
+      <option value="CD4052">CD4052 — Dual 4-Channel MUX/DEMUX</option>
+      <option value="CD4063">CD4063 — 4-bit Magnitude Comparator</option>
+      <option value="CD4069">CD4069 — Hex Inverter / NOT</option>
+      <option value="CD4070">CD4070 — Quad 2-Input XOR</option>
+      <option value="CD4071">CD4071 — Quad 2-Input OR</option>
+      <option value="CD4077">CD4077 — Quad 2-Input XNOR</option>
+      <option value="CD4081">CD4081 — Quad 2-Input AND</option>
+      <option value="CD4511">CD4511 — BCD to 7-Segment Latch/Decoder</option>
+      <option value="CD4555">CD4555 — Dual 1:4 Demultiplexer</option>
+    
+      <option value="LM741">LM741 — Operational Amplifier</option>
+      <option value="LM358">LM358 — Dual Operational Amplifier</option>
+    </optgroup>
+  </select>
+  <button class="tbtn" onclick="addIC()">+ Add IC</button>
+  <button class="tbtn green" onclick="showSuggestions()">💡 Suggestion</button>
+  <button class="tbtn red" onclick="clearWires()">Clear Wires</button>
+  <button class="tbtn red" onclick="clearAll()">Clear All</button>
+  <button class="tbtn" id="undoBtn" onclick="undoAction()" title="Undo last action (Ctrl+Z)" style="background:rgba(108, 92, 231, 0.8);color:#fff;">&#8630; Undo</button>
+  
+  <button class="tbtn yellow" onclick="zoomIn()">+ Zoom</button>
+  <button class="tbtn yellow" onclick="zoomOut()">− Zoom</button>
+  <button class="tbtn yellow" onclick="resetZoom()">Reset</button>
+  <span id="zoomLabel">100%</span>
+  <span id="statusBar">On/OFF</span>
+  <button id="pwrBtn" onclick="togglePwr()" title="Power On/Off">&#9210;</button>
+</div>
+
+<div id="canvasWrap">
+  <canvas id="wireCanvas"></canvas>
+  <div id="boardWorld">
+    <div id="board">
+      <div class="sec-label">&#9650; OUTPUT SECTION</div>
+      <div class="board-strip" id="outRow"></div>
+      <div id="icArea"></div>
+      <div class="board-strip" id="inRow"></div>
+      <div class="sec-label">&#9660; INPUT SECTION</div>
+      <!-- Clock / Pulse generator section -->
+      <div id="clkSection">
+        <span class="clk-section-title">CLK</span>
+        <div id="clkPins"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;margin-left:auto;">
+          <span style="color:#2ecc71;font-size:9px;font-weight:bold;">AUTO CLOCK</span>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span id="clkFreqLabel">1 Hz</span>
+            <input type="range" id="clkFreqSlider" min="0" max="11" step="1" value="0">
+          </div>
+          <button id="clkRunBtn" onclick="toggleClock()">&#9654; Start Auto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="ctxMenu">
+  <div class="ci danger" id="ctxDelWire">Delete this wire</div>
+  <div class="ci" id="ctxCancel">Cancel</div>
+</div>
+
+<!-- Suggestion Popup Modal -->
+<div id="suggestionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:rgba(255, 255, 255, 0.15); backdrop-filter:blur(16px); border:1px solid rgba(255, 255, 255, 0.3); border-radius:12px; padding:20px; max-width:500px; width:90%; color:#fff; font-family:'Courier New',monospace; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.37);">
+    <h3 style="color:#0ca5d7; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:5px;">🔌 Wiring Suggestions</h3>
+    <div id="suggestionContent" style="font-size:12px; line-height:1.6; color:#eee;"></div>
+    <button onclick="closeSuggestions()" class="tbtn red" style="margin-top:15px; float:right;">Close</button>
+  </div>
+</div>
+
+<footer class="footer-copyright">
+  <div>&copy; Copyright Vishal Malage. Designed & Developed by <a href="https://github.com/vishalmalage07" target="_blank"><b>Vishal Malage</b></a></div>
+  <div>
+    <a href="https://www.buymeacoffee.com/vishal_malage" target="_blank">
+      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="20" alt="Buy Me A Coffee" />
+    </a>
+  </div>
+</footer>
+
+<script>
+const IC_DEFS={
+  '7400':{name:'7400 NAND',pins:14,vcc:14,gnd:7,gates:[{t:'NAND',i:[1,2],o:3},{t:'NAND',i:[4,5],o:6},{t:'NAND',i:[10,9],o:8},{t:'NAND',i:[13,12],o:11}]},
+  '7402':{name:'7402 NOR',pins:14,vcc:14,gnd:7,gates:[{t:'NOR',i:[2,3],o:1},{t:'NOR',i:[5,6],o:4},{t:'NOR',i:[8,9],o:10},{t:'NOR',i:[11,12],o:13}]},
+  '7404':{name:'7404 NOT',pins:14,vcc:14,gnd:7,gates:[{t:'NOT',i:[1],o:2},{t:'NOT',i:[3],o:4},{t:'NOT',i:[5],o:6},{t:'NOT',i:[9],o:8},{t:'NOT',i:[11],o:10},{t:'NOT',i:[13],o:12}]},
+  '7408':{name:'7408 AND',pins:14,vcc:14,gnd:7,gates:[{t:'AND',i:[1,2],o:3},{t:'AND',i:[4,5],o:6},{t:'AND',i:[10,9],o:8},{t:'AND',i:[13,12],o:11}]},
+  '7410':{name:'7410 NAND3',pins:14,vcc:14,gnd:7,gates:[{t:'NAND',i:[1,2,13],o:12},{t:'NAND',i:[3,4,5],o:6},{t:'NAND',i:[9,10,11],o:8}]},
+  '7411':{name:'7411 AND3',pins:14,vcc:14,gnd:7,gates:[{t:'AND',i:[1,2,13],o:12},{t:'AND',i:[3,4,5],o:6},{t:'AND',i:[9,10,11],o:8}]},
+  '7432':{name:'7432 OR',pins:14,vcc:14,gnd:7,gates:[{t:'OR',i:[1,2],o:3},{t:'OR',i:[4,5],o:6},{t:'OR',i:[10,9],o:8},{t:'OR',i:[13,12],o:11}]},
+  '7447':{name:'7447 BCD-7SEG',pins:16,vcc:16,gnd:8,gates:[{t:'BCD7SEG_LOW',i:[7,1,2,6],o:[13,12,11,10,9,15,14]}]},
+  '7448':{name:'7448 BCD-7SEG',pins:16,vcc:16,gnd:8,gates:[{t:'BCD7SEG_HIGH',i:[7,1,2,6],o:[13,12,11,10,9,15,14]}]},
+  '7473':{name:'7473 JK-FF',pins:14,vcc:4,gnd:11,gates:[{t:'JKFF',clk:1,clr_n:2,j:14,k:3,q:12,qn:13},{t:'JKFF',clk:5,clr_n:6,j:7,k:10,q:9,qn:8}]},
+  '7474':{name:'7474 D-FF',pins:14,vcc:14,gnd:7,gates:[{t:'DFF',clk:3,d:2,pre_n:4,clr_n:1,q:5,qn:6},{t:'DFF',clk:11,d:12,pre_n:10,clr_n:13,q:9,qn:8}]},
+  '7476':{name:'7476 JK-FF',pins:16,vcc:5,gnd:13,gates:[{t:'JKFF',clk:1,pre_n:2,clr_n:3,j:4,k:16,q:15,qn:14},{t:'JKFF',clk:6,pre_n:7,clr_n:8,j:9,k:12,q:11,qn:10}]},
+  '7483':{name:'7483 ADDER',pins:16,vcc:5,gnd:12,gates:[{t:'ADDER',i:[10,8,3,1,11,7,4,16,13],o:[9,6,2,15,14]}]},
+  '7485':{name:'7485 COMP',pins:16,vcc:16,gnd:8,gates:[{t:'MAGCOMP',a:[9,11,14,1],b:[10,12,13,15],cas:[4,5,6],o:[5,6,7]}]},
+  '7486':{name:'7486 XOR',pins:14,vcc:14,gnd:7,gates:[{t:'XOR',i:[1,2],o:3},{t:'XOR',i:[4,5],o:6},{t:'XOR',i:[10,9],o:8},{t:'XOR',i:[13,12],o:11}]},
+  '7490':{name:'7490 COUNTER',pins:14,vcc:5,gnd:10,gates:[{t:'DECADE',clk:[14,1],r:[2,3,6,7],o:[12,9,8,11]}]},
+  '7493':{name:'7493 COUNTER',pins:14,vcc:5,gnd:10,gates:[{t:'RIPPLE4',clk:[14,1],r:[2,3],o:[12,9,8,11]}]},
+  '74107':{name:'74107 JK-FF',pins:14,vcc:14,gnd:7,gates:[{t:'JKFF',clk:12,clr_n:1,j:1,k:4,q:3,qn:2},{t:'JKFF',clk:9,clr_n:13,j:8,k:11,q:5,qn:6}]},
+  '74138':{name:'74138 DEMUX',pins:16,vcc:16,gnd:8,gates:[{t:'DEC3TO8',i:[1,2,3],e:[6,4,5],o:[15,14,13,12,11,10,9,7]}]},
+  '74139':{name:'74139 DEMUX2',pins:16,vcc:16,gnd:8,gates:[{t:'DEC2TO4',i:[2,3],e:1,o:[4,5,6,7]},{t:'DEC2TO4',i:[14,13],e:15,o:[12,11,10,9]}]},
+  '74151':{name:'74151 MUX',pins:16,vcc:16,gnd:8,gates:[{t:'MUX8TO1',i:[4,3,2,1,15,14,13,12],s:[11,10,9],en:7,o:[5,6]}]},
+  '74153':{name:'74153 MUX2',pins:16,vcc:16,gnd:8,gates:[{t:'MUX4TO1',i:[6,5,4,3],s:[14,2],en:1,o:7},{t:'MUX4TO1',i:[10,11,12,13],s:[14,2],en:15,o:9}]},
+  '74157':{name:'74157 MUX4',pins:16,vcc:16,gnd:8,gates:[{t:'QUADMUX',sel:1,en:15,i:[2,3,5,6,11,10,14,13],o:[4,7,9,12]}]},
+  '74164':{name:'74164 SHIFT',pins:14,vcc:14,gnd:7,gates:[{t:'SIPO',clk:8,clr_n:9,i:[1,2],o:[3,4,5,6,10,11,12,13]}]},
+  '74194':{name:'74194 SHIFT',pins:16,vcc:16,gnd:8,gates:[{t:'UNIVSHIFT',clk:11,clr_n:1,s:[9,10],sl:2,sr:7,d:[3,4,5,6],o:[15,14,13,12]}]},
+  '74195':{name:'74195 SHIFT',pins:16,vcc:16,gnd:8,gates:[{t:'PARSHIFT',clk:10,clr_n:1,j:2,kn:3,d:[4,5,6,7],st:9,o:[15,14,13,12,11]}]},
+  '74266':{name:'74266 XNOR',pins:14,vcc:14,gnd:7,gates:[{t:'XNOR',i:[1,2],o:3},{t:'XNOR',i:[4,5],o:6},{t:'XNOR',i:[10,9],o:8},{t:'XNOR',i:[13,12],o:11}]},
+
+  'CD4001':{name:'CD4001 NOR',pins:14,vcc:14,gnd:7,gates:[{t:'NOR',i:[1,2],o:3},{t:'NOR',i:[5,6],o:4},{t:'NOR',i:[8,9],o:10},{t:'NOR',i:[12,13],o:11}]},
+  'CD4011':{name:'CD4011 NAND',pins:14,vcc:14,gnd:7,gates:[{t:'NAND',i:[1,2],o:3},{t:'NAND',i:[5,6],o:4},{t:'NAND',i:[8,9],o:10},{t:'NAND',i:[12,13],o:11}]},
+  'CD4013':{name:'CD4013 D-FF',pins:14,vcc:14,gnd:7,gates:[{t:'DFF',clk:3,d:5,pre_n:6,clr_n:4,q:1,qn:2},{t:'DFF',clk:11,d:9,pre_n:8,clr_n:10,q:13,qn:12}]},
+  'CD4017':{name:'CD4017 COUNTER',pins:16,vcc:16,gnd:8,gates:[{t:'CD4017',clk:14,clken:13,rst:15,o:[3,2,4,7,10,1,5,6,9,11],co:12}]},
+  'CD4027':{name:'CD4027 JK-FF',pins:16,vcc:16,gnd:8,gates:[{t:'JKFF',clk:3,j:6,k:5,pre_n:7,clr_n:4,q:1,qn:2},{t:'JKFF',clk:13,j:10,k:11,pre_n:9,clr_n:12,q:15,qn:14}]},
+  'CD4051':{name:'CD4051 MUX/DEMUX',pins:16,vcc:16,gnd:8,gates:[{t:'ANALOG8',com:3,s:[11,10,9],en:6,ch:[13,14,15,12,1,5,2,4]}]},
+  'CD4052':{name:'CD4052 MUX/DEMUX2',pins:16,vcc:16,gnd:8,gates:[{t:'ANALOG4',com:13,s:[10,9],en:6,ch:[12,14,15,11]},{t:'ANALOG4',com:3,s:[10,9],en:6,ch:[1,5,2,4]}]},
+  'CD4063':{name:'CD4063 COMP',pins:16,vcc:16,gnd:8,gates:[{t:'MAGCOMP',a:[1,15,13,10],b:[2,14,12,9],cas:[4,5,6],o:[5,6,7]}]},
+  'CD4069':{name:'CD4069 NOT',pins:14,vcc:14,gnd:7,gates:[{t:'NOT',i:[1],o:2},{t:'NOT',i:[3],o:4},{t:'NOT',i:[5],o:6},{t:'NOT',i:[9],o:8},{t:'NOT',i:[11],o:10},{t:'NOT',i:[13],o:12}]},
+  'CD4070':{name:'CD4070 XOR',pins:14,vcc:14,gnd:7,gates:[{t:'XOR',i:[1,2],o:3},{t:'XOR',i:[5,6],o:4},{t:'XOR',i:[8,9],o:10},{t:'XOR',i:[12,13],o:11}]},
+  'CD4071':{name:'CD4071 OR',pins:14,vcc:14,gnd:7,gates:[{t:'OR',i:[1,2],o:3},{t:'OR',i:[5,6],o:4},{t:'OR',i:[8,9],o:10},{t:'OR',i:[12,13],o:11}]},
+  'CD4077':{name:'CD4077 XNOR',pins:14,vcc:14,gnd:7,gates:[{t:'XNOR',i:[1,2],o:3},{t:'XNOR',i:[5,6],o:4},{t:'XNOR',i:[8,9],o:10},{t:'XNOR',i:[12,13],o:11}]},
+  'CD4081':{name:'CD4081 AND',pins:14,vcc:14,gnd:7,gates:[{t:'AND',i:[1,2],o:3},{t:'AND',i:[5,6],o:4},{t:'AND',i:[8,9],o:10},{t:'AND',i:[12,13],o:11}]},
+  'CD4511':{name:'CD4511 BCD-7SEG',pins:16,vcc:16,gnd:8,gates:[{t:'BCD7SEG_HIGH',i:[7,1,2,6],lt:3,bl:4,le:5,o:[13,12,11,10,9,15,14]}]},
+  'CD4555':{name:'CD4555 DEMUX2',pins:16,vcc:16,gnd:8,gates:[{t:'DEC2TO4_HIGH',i:[2,3],e:1,o:[4,5,6,7]},{t:'DEC2TO4_HIGH',i:[14,13],e:15,o:[12,11,10,9]}]},
+
+  'LM741':{name:'LM741 OP-AMP',pins:8,vcc:7,gnd:4,gates:[{t:'OPAMP',inv:2,noninv:3,o:6}]},
+  'LM358':{name:'LM358 DUAL OP-AMP',pins:8,vcc:8,gnd:4,gates:[{t:'OPAMP',inv:2,noninv:3,o:1},{t:'OPAMP',inv:6,noninv:5,o:7}]}
+};
+
+const WIRING_GUIDES = {
+  '7400': '<b>7400 NAND Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pin 1 & 2 → Inputs, Pin 3 → Output',
+  '7402': '<b>7402 NOR Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pin 2 & 3 → Inputs, Pin 1 → Output',
+  '7404': '<b>7404 NOT Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Inverter 1: Pin 1 → Input, Pin 2 → Output',
+  '7408': '<b>7408 AND Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pin 1 & 2 → Inputs, Pin 3 → Output',
+  '7410': '<b>7410 Triple NAND Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pins 1, 2, 13 → Inputs, Pin 12 → Output',
+  '7411': '<b>7411 Triple AND Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pins 1, 2, 13 → Inputs, Pin 12 → Output',
+  '7432': '<b>7432 OR Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pin 1 & 2 → Inputs, Pin 3 → Output',
+  '7447': '<b>7447 BCD Decoder Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• BCD Inputs: Pins 7 (A), 1 (B), 2 (C), 6 (D)<br>• Outputs: Pins 13 (a), 12 (b), 11 (c), 10 (d), 9 (e), 15 (f), 14 (g)',
+  '7448': '<b>7448 BCD Decoder Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• BCD Inputs: Pins 7 (A), 1 (B), 2 (C), 6 (D)<br>• Outputs: Pins 13 (a), 12 (b), 11 (c), 10 (d), 9 (e), 15 (f), 14 (g)',
+  '7473': '<b>7473 JK Flip-Flop Wiring:</b><br>• Power: Pin 4 → VCC, Pin 11 → GND<br>• Clear (Pin 2) → HIGH / VCC<br>• Pin 14 → J, Pin 3 → K, Pin 1 → Clock<br>• Pin 12 → Q Output',
+  '7474': '<b>7474 D Flip-Flop Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Preset (Pin 4) & Clear (Pin 1) → HIGH / VCC<br>• Pin 2 → Data, Pin 3 → Clock<br>• Pin 5 → Q Output',
+  '7476': '<b>7476 JK Flip-Flop Wiring:</b><br>• Power: Pin 5 → VCC, Pin 13 → GND<br>• Preset (Pin 2) & Clear (Pin 3) → VCC<br>• Pin 4 → J, Pin 16 → K, Pin 1 → Clock',
+  '7483': '<b>7483 Adder Wiring:</b><br>• Power: Pin 5 → VCC, Pin 12 → GND<br>• A Inputs: Pins 10, 8, 3, 1<br>• B Inputs: Pins 11, 7, 4, 16<br>• Sum Outputs: Pins 9, 6, 2, 15, 14',
+  '7485': '<b>7485 Comparator Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• A Inputs: Pins 9, 11, 14, 1<br>• B Inputs: Pins 10, 12, 13, 15',
+  '7486': '<b>7486 XOR Gate Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Gate 1: Pin 1 & 2 → Inputs, Pin 3 → Output',
+  '7490': '<b>7490 Decade Counter Wiring:</b><br>• Power: Pin 5 → VCC, Pin 10 → GND<br>• Connect Pin 12 (QA) to Pin 1 (CLK B)<br>• Input: Pin 14 → CLK | Reset: Ground Pins 2, 3, 6, 7',
+  '7493': '<b>7493 Binary Counter Wiring:</b><br>• Power: Pin 5 → VCC, Pin 10 → GND<br>• Connect Pin 12 (QA) to Pin 1 (CLK B)<br>• Input: Pin 14 → CLK | Reset: Ground Pins 2, 3',
+  '74107': '<b>74107 JK Flip-Flop Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Clear (Pin 1) → VCC<br>• Pin 1 → J, Pin 4 → K, Pin 12 → Clock',
+  '74138': '<b>74138 3-to-8 Decoder Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Enable: Pin 6 → VCC, Pins 4 & 5 → GND',
+  '74139': '<b>74139 Dual Demux Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Enable (Pin 1) → GND',
+  '74151': '<b>74151 8-to-1 MUX Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Enable (Pin 7) → GND',
+  '74153': '<b>74153 Dual 4:1 MUX Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Enable (Pin 1) → GND',
+  '74157': '<b>74157 Quad MUX Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Select: Pin 1 | Enable: Pin 15 → GND',
+  '74164': '<b>74164 Shift Register Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Clear (Pin 9) → VCC',
+  '74194': '<b>74194 Universal Shift Register Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Clear (Pin 1) → VCC | Pins 9 & 10 → Select Mode',
+  '74195': '<b>74195 Shift Register Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Clear (Pin 1) → VCC',
+  '74266': '<b>74266 Quad XNOR Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND<br>• Pin 1 & 2 → Inputs, Pin 3 → Output',
+  'CD4001': '<b>CD4001 Quad NOR Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4011': '<b>CD4011 Quad NAND Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4013': '<b>CD4013 Dual D-FF Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4017': '<b>CD4017 Decade Counter Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Reset (Pin 15) → GND, Enable (Pin 13) → GND',
+  'CD4027': '<b>CD4027 Dual JK-FF Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND',
+  'CD4051': '<b>CD4051 8-ch Analog MUX Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Enable (Pin 6) → GND',
+  'CD4052': '<b>CD4052 Dual 4-ch Analog MUX Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND',
+  'CD4063': '<b>CD4063 Magnitude Comparator Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND',
+  'CD4069': '<b>CD4069 Hex Inverter Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4070': '<b>CD4070 Quad XOR Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4071': '<b>CD4071 Quad OR Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4077': '<b>CD4077 Quad XNOR Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4081': '<b>CD4081 Quad AND Wiring:</b><br>• Power: Pin 14 → VCC, Pin 7 → GND',
+  'CD4511': '<b>CD4511 BCD Decoder Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND<br>• Lamp Test (Pin 3) & Blanking (Pin 4) → VCC',
+  'CD4555': '<b>CD4555 Dual 1:4 Demux Wiring:</b><br>• Power: Pin 16 → VCC, Pin 8 → GND',
+  'LM741': '<b>LM741 Op-Amp Wiring:</b><br>• Power: Pin 7 → VCC, Pin 4 → GND<br>• Inputs: Pin 2 (Inverting), Pin 3 (Non-Inverting)<br>• Output: Pin 6',
+  'LM358': '<b>LM358 Dual Op-Amp Wiring:</b><br>• Power: Pin 8 → VCC, Pin 4 → GND<br>• Op-Amp 1: Pins 2 & 3 Inputs, Pin 1 Output'
+};
+<!--Designed & Developed by Vishal Malage -->
+const N_IN=16, N_OUT=16;
+let powered=false, ics=[], icCnt=0, wires=[], dragWire=null;
+let inStates=Array(N_IN).fill(0), outStates=Array(N_OUT).fill(0);
+let seg7States={a:0,b:0,c:0,d:0,e:0,f:0,g:0,dp:0};
+let zoom=1, panX=10, panY=10, isPanning=false, panStart={x:0,y:0};
+const WIRE_COLORS=['#ff0','#0ff','#f0f','#0f8','#f80','#8ff','#f66','#6f6','#66f','#ff8','#8ff','#f8f'];
+let wColorIdx=0;
+let ctxWireIdx=-1;
+let trimMode=false;
+let undoStack=[];
+const ffState={};
+
+const N_CLK=4;
+let clkStates=Array(N_CLK).fill(0);
+let clkRunning=false;
+let clkInterval=null;
+const CLK_FREQS=[1,2,4,5,8,10,16,20,25,32,50,100];
+
+const canvasWrap=document.getElementById('canvasWrap');
+const canvas=document.getElementById('wireCanvas');
+const ctx=canvas.getContext('2d');
+const boardWorld=document.getElementById('boardWorld');
+
+function showSuggestions(){
+  const contentEl=document.getElementById('suggestionContent');
+  if(ics.length===0){
+    contentEl.innerHTML='<p style="color:#f64e4d;">No ICs added to the board yet! Add an IC from the top menu first.</p>';
+  }else{
+    let html='<p><b>General Power Rule:</b> Always connect <b>VCC</b> and <b>GND</b> for each chip first.</p><br>';
+    ics.forEach((ic)=>{
+      const guide=WIRING_GUIDES[ic.type]||'No guide available for this IC.';
+      html+=`<div style="margin-bottom:12px; padding:8px; background:rgba(0,0,0,0.25); border-left:3px solid #0ca5d7; border-radius:4px;">`;
+      html+=`<b>[IC ${ic.id}] ${ic.def.name}:</b><br>${guide}`;
+      html+=`</div>`;
+    });
+    contentEl.innerHTML=html;
+  }
+  document.getElementById('suggestionModal').style.display='flex';
+}
+
+function closeSuggestions(){
+  document.getElementById('suggestionModal').style.display='none';
+}
+
+function applyTransform(){
+  boardWorld.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;
+  document.getElementById('zoomLabel').textContent=Math.round(zoom*100)+'%';
+  drawWires();
+}
+
+function zoomIn(){zoom=Math.min(3,zoom+0.15);applyTransform();}
+function zoomOut(){zoom=Math.max(0.25,zoom-0.15);applyTransform();}
+function resetZoom(){zoom=1;panX=10;panY=10;applyTransform();}
+
+canvasWrap.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const delta=e.deltaY>0?-0.1:0.1;
+  const rect=canvasWrap.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const newZoom=Math.max(0.25,Math.min(3,zoom+delta));
+  panX=mx-(mx-panX)*(newZoom/zoom);
+  panY=my-(my-panY)*(newZoom/zoom);
+  zoom=newZoom;
+  applyTransform();
+},{passive:false});
+
+canvasWrap.addEventListener('mousedown',e=>{
+  if(e.button===1||(e.button===0&&e.altKey)){isPanning=true;panStart={x:e.clientX-panX,y:e.clientY-panY};canvasWrap.style.cursor='grabbing';}
+});
+window.addEventListener('mousemove',e=>{
+  if(isPanning){panX=e.clientX-panStart.x;panY=e.clientY-panStart.y;applyTransform();}
+  if(dragWire){
+    const r=canvas.getBoundingClientRect();
+    dragWire.mx=e.clientX-r.left;
+    dragWire.my=e.clientY-r.top;
+    drawWires();
+  }
+});
+window.addEventListener('mouseup',e=>{
+  if(e.button===1||(e.button===0&&e.altKey)){isPanning=false;canvasWrap.style.cursor='default';}
+});
+
+function resizeCanvas(){
+  const r=canvasWrap.getBoundingClientRect();
+  canvas.width=r.width; canvas.height=r.height;
+}
+
+function boardToCanvas(el){
+  if(!el) return null;
+  const wr=canvas.getBoundingClientRect();
+  const er=el.getBoundingClientRect();
+  return {x:er.left-wr.left+er.width/2, y:er.top-wr.top+er.height/2};
+}
+
+function drawWires(){
+  resizeCanvas();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  wires.forEach((w,idx)=>{
+    const aEl=getPinEl(w.from), bEl=getPinEl(w.to);
+    if(!aEl||!bEl) return;
+    const a=boardToCanvas(aEl), b=boardToCanvas(bEl);
+    if(!a||!b) return;
+    ctx.strokeStyle=w.color;
+    ctx.lineWidth=trimMode?3.5:2.5;
+    ctx.lineCap='round';
+    const mx=(a.x+b.x)/2;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.bezierCurveTo(mx,a.y,mx,b.y,b.x,b.y);
+    ctx.stroke();
+    ctx.fillStyle=w.color;
+    [a,b].forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();});
+    w._path={a,b,mx};
+  });
+  if(dragWire){
+    const aEl=getPinEl(dragWire.from);
+    if(aEl){
+      const a=boardToCanvas(aEl);
+      ctx.strokeStyle='#fff';
+      ctx.lineWidth=1.5;
+      ctx.setLineDash([5,4]);
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);
+      ctx.lineTo(dragWire.mx,dragWire.my);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+}
+
+function hitWire(mx,my){
+  for(let idx=wires.length-1;idx>=0;idx--){
+    const w=wires[idx];
+    if(!w._path) continue;
+    const {a,b,mx:cmx}=w._path;
+    for(let t=0;t<=1;t+=0.05){
+      const bx=Math.pow(1-t,3)*a.x+3*Math.pow(1-t,2)*t*cmx+3*(1-t)*t*t*cmx+t*t*t*b.x;
+      const by=Math.pow(1-t,3)*a.y+3*Math.pow(1-t,2)*t*a.y+3*(1-t)*t*t*b.y+t*t*t*b.y;
+      if(Math.abs(bx-mx)<8&&Math.abs(by-my)<8) return idx;
+    }
+  }
+  return -1;
+}
+
+function updateTrimUi(){
+  const btn=document.getElementById('trimBtn');
+  if(btn) btn.classList.toggle('active',trimMode);
+  canvasWrap.style.cursor=trimMode?'crosshair':'default';
+}
+
+function toggleTrimMode(){
+  trimMode=!trimMode;
+  document.getElementById('ctxMenu').style.display='none';
+  if(trimMode){
+    document.getElementById('statusBar').textContent='Trim mode ON - click a wire to cut it';
+  }else{
+    document.getElementById('statusBar').textContent='Trim mode OFF - drag from any pin to connect wires';
+  }
+  updateTrimUi();
+  drawWires();
+}
+
+function getPinEl(id){return document.querySelector(`[data-pid="${CSS.escape(id)}"]`);}
+
+function pinId(type,idx,p){
+  if(type==='in') return `IN_${idx}`;
+  if(type==='out') return `OUT_${idx}`;
+  if(type==='ic') return `IC_${idx}_${p}`;
+  if(type==='seg7') return `SEG7_${idx}`;
+  return type;
+}
+
+function getIcPinInfo(id){
+  if(!id.startsWith('IC_')) return null;
+  const parts=id.split('_');
+  const ic=ics.find(x=>x.id===parseInt(parts[1],10));
+  if(!ic) return null;
+  return {ic,pin:parseInt(parts[2],10)};
+}
+
+function getIcPinRole(ic,pin){
+  if(pin===ic.def.vcc||pin===ic.def.gnd) return 'power';
+  let isInput=false, isOutput=false;
+  ic.def.gates.forEach(g=>{
+    if(g.t==='DFF'){
+      [g.d,g.clk,g.pre_n,g.clr_n].forEach(p=>{if(p===pin) isInput=true;});
+      [g.q,g.qn].forEach(p=>{if(p===pin) isOutput=true;});
+    } else if(g.t==='JKFF'){
+      [g.j,g.k,g.clk,g.clr_n,g.pre_n].forEach(p=>{if(p===pin) isInput=true;});
+      [g.q,g.qn].forEach(p=>{if(p===pin) isOutput=true;});
+    } else if(g.t==='OPAMP'){
+      if(pin===g.inv||pin===g.noninv) isInput=true;
+      if(pin===g.o) isOutput=true;
+    } else {
+      if(g.i) g.i.forEach(p=>{if(p===pin) isInput=true;});
+      if(g.s) (Array.isArray(g.s)?g.s:[g.s]).forEach(p=>{if(p===pin) isInput=true;});
+      if(g.e) (Array.isArray(g.e)?g.e:[g.e]).forEach(p=>{if(p===pin) isInput=true;});
+      if(g.en!=null) isInput=true;
+      if(g.o!=null) (Array.isArray(g.o)?g.o:[g.o]).forEach(p=>{if(p===pin) isOutput=true;});
+    }
+  });
+  if(isOutput && !isInput) return 'output';
+  if(isInput && !isOutput) return 'input';
+  if(isInput && isOutput) return 'io';
+  return 'nc';
+}
+
+function buildNetMap(){
+  const graph=new Map();
+  function ensure(id){
+    if(!graph.has(id)) graph.set(id,new Set());
+    return graph.get(id);
+  }
+  wires.forEach(w=>{
+    ensure(w.from).add(w.to);
+    ensure(w.to).add(w.from);
+  });
+  const nodeToComp=new Map();
+  const comps=[];
+  graph.forEach((_,start)=>{
+    if(nodeToComp.has(start)) return;
+    const stack=[start];
+    const nodes=[];
+    const cid=comps.length;
+    nodeToComp.set(start,cid);
+    while(stack.length){
+      const cur=stack.pop();
+      nodes.push(cur);
+      graph.get(cur).forEach(next=>{
+        if(nodeToComp.has(next)) return;
+        nodeToComp.set(next,cid);
+        stack.push(next);
+      });
+    }
+    comps.push(nodes);
+  });
+  return {nodeToComp,comps};
+}
+
+function simulate() {
+  outStates = Array(N_OUT).fill(0);
+  seg7States = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, dp: 0 };
+  if (!powered) {
+    ics.forEach(ic => { ic.ps = {}; });
+    return;
+  }
+
+  const nets = buildNetMap();
+
+  ics.forEach(ic => {
+    ic.ps = {};
+    for (let p = 1; p <= ic.def.pins; p++) ic.ps[p] = 0;
+    ic.def.gates.forEach(g => {
+      if (g.t === 'DFF') { ic.ps[g.pre_n] = 1; ic.ps[g.clr_n] = 1; }
+      if (g.t === 'JKFF') { if(g.pre_n) ic.ps[g.pre_n] = 1; if(g.clr_n) ic.ps[g.clr_n] = 1; }
+    });
+  });
+
+  const prevClkSnap = {};
+  ics.forEach(ic => {
+    ic.def.gates.forEach((g, gi) => {
+      if (g.t === 'DFF' || g.t === 'JKFF' || g.t === 'DECADE' || g.t === 'RIPPLE4' || g.t === 'CD4017') {
+        const key = `${ic.id}_${gi}`;
+        if (!ffState[key]) ffState[key] = { q: 0, count: 0, prevClk: g.t === 'JKFF' ? 1 : 0 };
+        prevClkSnap[key] = ffState[key].prevClk;
+      }
+    });
+  });
+
+  function fixedVal(id) {
+    if (id === 'VCC' || id === 'HIGH') return 1;
+    if (id === 'GND' || id === 'LOW') return 0;
+    if (id.startsWith('IN_')) return inStates[parseInt(id.split('_')[1], 10)] || 0;
+    if (id.startsWith('CLK_')) return clkStates[parseInt(id.split('_')[1], 10)] || 0;
+    return null;
+  }
+
+  function buildNetVals(driven) {
+    const m = new Map();
+    nets.comps.forEach((nodes, cid) => {
+      let hi = false, lo = false;
+      nodes.forEach(id => {
+        const v = fixedVal(id);
+        if (v === 1) hi = true;
+        else if (v === 0) lo = true;
+
+        if (driven && driven.has(id)) {
+          const dv = driven.get(id);
+          if (dv === 1) hi = true;
+          else if (dv === 0) lo = true;
+        }
+      });
+      if (hi || lo) m.set(cid, hi ? 1 : 0);
+    });
+    return m;
+  }
+
+  function applyNets(m) {
+    ics.forEach(ic => {
+      for (let p = 1; p <= ic.def.pins; p++) ic.ps[p] = 0;
+      ic.def.gates.forEach(g => {
+        if (g.t === 'DFF') { ic.ps[g.pre_n] = 1; ic.ps[g.clr_n] = 1; }
+        if (g.t === 'JKFF') { if(g.pre_n) ic.ps[g.pre_n] = 1; if(g.clr_n) ic.ps[g.clr_n] = 1; }
+      });
+    });
+    outStates.fill(0);
+    seg7States = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, dp: 0 };
+    m.forEach((val, cid) => {
+      nets.comps[cid].forEach(id => {
+        if (id.startsWith('OUT_')) { outStates[parseInt(id.split('_')[1], 10)] = val; return; }
+        if (id.startsWith('SEG7_')) { 
+          seg7States[id.split('_')[1]] = val; 
+          return; 
+        }
+        const info = getIcPinInfo(id);
+        if (!info) return;
+        const role = getIcPinRole(info.ic, info.pin);
+        if (role !== 'power') info.ic.ps[info.pin] = val;
+      });
+    });
+  }
+
+  const driven = new Map();
+
+  ics.forEach(ic => {
+    ic.def.gates.forEach((g, gi) => {
+      const st = ffState[`${ic.id}_${gi}`];
+      if (st) {
+        if (g.t === 'DFF' || g.t === 'JKFF') {
+          driven.set(pinId('ic', ic.id, g.q), st.q);
+          driven.set(pinId('ic', ic.id, g.qn), st.q ? 0 : 1);
+        } else if (g.t === 'DECADE' || g.t === 'RIPPLE4') {
+          const val = st.count || 0;
+          g.o.forEach((pin, idx) => {
+            driven.set(pinId('ic', ic.id, pin), (val >> idx) & 1);
+          });
+        } else if (g.t === 'CD4017') {
+          const val = st.count || 0;
+          g.o.forEach((pin, idx) => {
+            driven.set(pinId('ic', ic.id, pin), idx === val ? 1 : 0);
+          });
+          driven.set(pinId('ic', ic.id, g.co), val < 5 ? 1 : 0);
+        }
+      }
+    });
+  });
+
+  const bcd7SegTable = {
+    0: [1,1,1,1,1,1,0], 1: [0,1,1,0,0,0,0], 2: [1,1,0,1,1,0,1], 3: [1,1,1,1,0,0,1],
+    4: [0,1,1,0,0,1,1], 5: [1,0,1,1,0,1,1], 6: [1,0,1,1,1,1,1], 7: [1,1,1,0,0,0,0],
+    8: [1,1,1,1,1,1,1], 9: [1,1,1,1,0,1,1]
+  };
+
+  for (let it = 0; it < 16; it++) {
+    const m = buildNetVals(driven);
+    applyNets(m);
+
+    const newDriven = new Map(driven);
+    let changed = false;
+
+    ics.forEach(ic => {
+      ic.def.gates.forEach(g => {
+        if (g.t === 'BCD7SEG_LOW' || g.t === 'BCD7SEG_HIGH') {
+          if (g.lt && (ic.ps[g.lt] === 0)) {
+            g.o.forEach(outPin => newDriven.set(pinId('ic', ic.id, outPin), 1));
+            return;
+          }
+          if (g.bl && (ic.ps[g.bl] === 0)) {
+            g.o.forEach(outPin => newDriven.set(pinId('ic', ic.id, outPin), 0));
+            return;
+          }
+          const val = (ic.ps[g.i[0]] || 0) |
+                     ((ic.ps[g.i[1]] || 0) << 1) |
+                     ((ic.ps[g.i[2]] || 0) << 2) |
+                     ((ic.ps[g.i[3]] || 0) << 3);
+
+          const segs = bcd7SegTable[val] || [0, 0, 0, 0, 0, 0, 0];
+          const isLow = (g.t === 'BCD7SEG_LOW');
+
+          g.o.forEach((outPin, idx) => {
+            let active = segs[idx];
+            let outVal = isLow ? (active ? 0 : 1) : (active ? 1 : 0);
+            const pid = pinId('ic', ic.id, outPin);
+            if (newDriven.get(pid) !== outVal) {
+              newDriven.set(pid, outVal);
+              changed = true;
+            }
+          });
+          return;
+        }
+
+        if (g.t === 'OPAMP') {
+          const inv = ic.ps[g.inv] || 0;
+          const noninv = ic.ps[g.noninv] || 0;
+          const o = noninv > inv ? 1 : 0;
+          const pid = pinId('ic', ic.id, g.o);
+          if (newDriven.get(pid) !== o) {
+            newDriven.set(pid, o);
+            changed = true;
+          }
+          return;
+        }
+
+        if (g.t === 'XNOR') {
+          const ins = g.i.map(p => ic.ps[p] || 0);
+          const o = ins.reduce((a, b) => a ^ b, 0) ? 0 : 1;
+          const pid = pinId('ic', ic.id, g.o);
+          if (newDriven.get(pid) !== o) {
+            newDriven.set(pid, o);
+            changed = true;
+          }
+          return;
+        }
+
+        if (g.t === 'MAGCOMP') {
+          const A = (ic.ps[g.a[0]]||0) | ((ic.ps[g.a[1]]||0)<<1) | ((ic.ps[g.a[2]]||0)<<2) | ((ic.ps[g.a[3]]||0)<<3);
+          const B = (ic.ps[g.b[0]]||0) | ((ic.ps[g.b[1]]||0)<<1) | ((ic.ps[g.b[2]]||0)<<2) | ((ic.ps[g.b[3]]||0)<<3);
+          let agtb = A > B ? 1 : 0;
+          let altb = A < B ? 1 : 0;
+          let aeqb = A === B ? 1 : 0;
+          if (A === B && g.cas) {
+            agtb = ic.ps[g.cas[0]] || 0;
+            altb = ic.ps[g.cas[1]] || 0;
+            aeqb = ic.ps[g.cas[2]] || 0;
+          }
+          const outs = [agtb, altb, aeqb];
+          g.o.forEach((pin, idx) => {
+            const pid = pinId('ic', ic.id, pin);
+            if (newDriven.get(pid) !== outs[idx]) {
+              newDriven.set(pid, outs[idx]);
+              changed = true;
+            }
+          });
+          return;
+        }
+
+        if (g.t === 'DEC2TO4' || g.t === 'DEC2TO4_HIGH') {
+          const en = ic.ps[g.e] || 0;
+          const sel = (ic.ps[g.i[0]] || 0) | ((ic.ps[g.i[1]] || 0) << 1);
+          const isHigh = (g.t === 'DEC2TO4_HIGH');
+          g.o.forEach((pin, idx) => {
+            let active = (en === 0) && (sel === idx);
+            let o = isHigh ? (active ? 1 : 0) : (active ? 0 : 1);
+            const pid = pinId('ic', ic.id, pin);
+            if (newDriven.get(pid) !== o) {
+              newDriven.set(pid, o);
+              changed = true;
+            }
+          });
+          return;
+        }
+
+        if (g.t === 'MUX4TO1') {
+          const en = ic.ps[g.en] || 0;
+          const sel = (ic.ps[g.s[0]] || 0) | ((ic.ps[g.s[1]] || 0) << 1);
+          let o = 0;
+          if (en === 0) o = ic.ps[g.i[sel]] || 0;
+          const pid = pinId('ic', ic.id, g.o);
+          if (newDriven.get(pid) !== o) {
+            newDriven.set(pid, o);
+            changed = true;
+          }
+          return;
+        }
+
+        if (g.t === 'ANALOG8') {
+          const en = ic.ps[g.en] || 0;
+          const sel = (ic.ps[g.s[0]] || 0) | ((ic.ps[g.s[1]] || 0) << 1) | ((ic.ps[g.s[2]] || 0) << 2);
+          if (en === 0) {
+            const val = ic.ps[g.com] || 0;
+            const pid = pinId('ic', ic.id, g.ch[sel]);
+            if (newDriven.get(pid) !== val) {
+              newDriven.set(pid, val);
+              changed = true;
+            }
+          }
+          return;
+        }
+
+        if (g.t === 'DFF' || g.t === 'JKFF' || g.t === 'ADDER' || g.t === 'DECADE' || g.t === 'RIPPLE4' || g.t === 'CD4017') return;
+        if (!g.i) return;
+        const ins = g.i.map(p => ic.ps[p] || 0);
+        let o = 0;
+        if (g.t === 'AND') o = ins.every(v => v) ? 1 : 0;
+        else if (g.t === 'OR') o = ins.some(v => v) ? 1 : 0;
+        else if (g.t === 'NAND') o = ins.every(v => v) ? 0 : 1;
+        else if (g.t === 'NOR') o = ins.some(v => v) ? 0 : 1;
+        else if (g.t === 'XOR') o = ins.reduce((a, b) => a ^ b, 0);
+        else if (g.t === 'NOT') o = ins[0] ? 0 : 1;
+
+        const pid = pinId('ic', ic.id, g.o);
+        if (newDriven.get(pid) !== o) {
+          newDriven.set(pid, o);
+          changed = true;
+        }
+      });
+
+      ic.def.gates.forEach(g => {
+        if (g.t !== 'ADDER') return;
+        const A = (ic.ps[10] || 0) + ((ic.ps[8] || 0) << 1) + ((ic.ps[3] || 0) << 2) + ((ic.ps[1] || 0) << 3);
+        const B = (ic.ps[11] || 0) + ((ic.ps[7] || 0) << 1) + ((ic.ps[4] || 0) << 2) + ((ic.ps[16] || 0) << 3);
+        const s = A + B + (ic.ps[13] || 0);
+        [9, 6, 2, 15, 14].forEach((pin, idx) => {
+          const o = [(s & 1), (s >> 1) & 1, (s >> 2) & 1, (s >> 3) & 1, (s >> 4) & 1][idx];
+          const pid = pinId('ic', ic.id, pin);
+          if (newDriven.get(pid) !== o) {
+            newDriven.set(pid, o);
+            changed = true;
+          }
+        });
+      });
+    });
+
+    newDriven.forEach((v, k) => driven.set(k, v));
+    if (!changed) break;
+  }
+
+  const finalM = buildNetVals(driven);
+  applyNets(finalM);
+
+  ics.forEach(ic => {
+    ic.def.gates.forEach((g, gi) => {
+      const key = `${ic.id}_${gi}`;
+      const st = ffState[key];
+      if (!st) return;
+      const prevClk = prevClkSnap[key];
+      if (g.t === 'DFF') {
+        const clk = ic.ps[g.clk] || 0;
+        const pre_n = ic.ps[g.pre_n];
+        const clr_n = ic.ps[g.clr_n];
+        if (clr_n === 0) st.q = 0;
+        else if (pre_n === 0) st.q = 1;
+        else if (clk === 1 && prevClk === 0) st.q = ic.ps[g.d] || 0;
+        st.prevClk = clk;
+      } else if (g.t === 'JKFF') {
+        const clk = ic.ps[g.clk] || 0;
+        const clr_n = ic.ps[g.clr_n];
+        const pre_n = ic.ps[g.pre_n];
+        const J = ic.ps[g.j] || 0, K = ic.ps[g.k] || 0;
+        if (clr_n === 0) st.q = 0;
+        else if (pre_n === 0) st.q = 1;
+        else if (clk === 0 && prevClk === 1) {
+          if (J && K) st.q = st.q ? 0 : 1;
+          else if (J) st.q = 1;
+          else if (K) st.q = 0;
+        }
+        st.prevClk = clk;
+      } else if (g.t === 'DECADE' || g.t === 'RIPPLE4') {
+        const clk = ic.ps[g.clk[0]] || 0;
+        if (clk === 0 && prevClk === 1) {
+          st.count = ((st.count || 0) + 1) % (g.t === 'DECADE' ? 10 : 16);
+        }
+        st.prevClk = clk;
+      } else if (g.t === 'CD4017') {
+        const clk = ic.ps[g.clk] || 0;
+        const rst = ic.ps[g.rst] || 0;
+        if (rst === 1) {
+          st.count = 0;
+        } else if (clk === 1 && prevClk === 0) {
+          st.count = ((st.count || 0) + 1) % 10;
+        }
+        st.prevClk = clk;
+      }
+      if (g.t === 'DFF' || g.t === 'JKFF') {
+        driven.set(pinId('ic', ic.id, g.q), st.q);
+        driven.set(pinId('ic', ic.id, g.qn), st.q ? 0 : 1);
+      }
+    });
+  });
+
+  const ff2 = buildNetVals(driven);
+  applyNets(ff2);
+}
+
+function markConnected(){
+  document.querySelectorAll('.pin-stub').forEach(el=>el.classList.remove('connected'));
+  wires.forEach(w=>{
+    const a=getPinEl(w.from),b=getPinEl(w.to);
+    if(a) a.classList.add('connected');
+    if(b) b.classList.add('connected');
+  });
+}
+
+function isPinConnected(pid){
+  return wires.some(w=>w.from===pid||w.to===pid);
+}
+
+function renderLEDs(){
+  for(let i=0;i<N_OUT;i++){
+    const bulb=document.getElementById(`obulb${i}`);
+    const note=document.getElementById(`onote${i}`);
+    const connected=isPinConnected(pinId('out',i,0));
+    const high=Boolean(outStates[i]&&powered);
+    if(bulb){
+      bulb.className='out-bulb';
+      if(powered&&connected) bulb.classList.add('live');
+      if(high) bulb.classList.add('on');
+    }
+    if(note){
+      note.className='out-note';
+      if(!powered) note.textContent='OFF';
+      else if(!connected) note.textContent='OPEN';
+      else if(high){
+        note.textContent='HIGH';
+        note.classList.add('live','on');
+      }else{
+        note.textContent='LOW';
+        note.classList.add('live');
+      }
+    }
+  }
+  for(let i=0;i<N_IN;i++){
+    const el=document.getElementById(`iled${i}`);if(el)el.className='led'+(inStates[i]&&powered?' hi':'');
+    const tg=document.getElementById(`itog${i}`);if(tg)tg.className='toggle-sw'+(inStates[i]?' hi':'');
+  }
+  ics.forEach(ic=>{
+    for(let p=1;p<=ic.def.pins;p++){
+      const el=getPinEl(pinId('ic',ic.id,p));
+      if(el) el.style.background=(ic.ps[p]&&powered)?'#ff2222':'rgba(255,255,255,0.6)';
+    }
+  });
+
+  ['a','b','c','d','e','f','g','dp'].forEach(seg=>{
+    const el=document.getElementById(`seg_${seg}`);
+    if(el){
+      let isLit = false;
+      const pin = `SEG7_${seg}`;
+      
+      let connectedIc = null;
+      wires.forEach(w => {
+        if(w.from === pin) connectedIc = getIcPinInfo(w.to);
+        if(w.to === pin) connectedIc = getIcPinInfo(w.from);
+      });
+
+      if (powered && isPinConnected(pin)) {
+        if (connectedIc && (connectedIc.ic.type === '7447')) {
+          isLit = (seg7States[seg] === 0);
+        } else {
+          isLit = (seg7States[seg] === 1);
+        }
+      }
+
+      if (isLit) {
+        el.classList.add('on');
+      } else {
+        el.classList.remove('on');
+      }
+    }
+  });
+
+  drawWires();
+}
+
+function makePinStub(pid){
+  const el=document.createElement('div');
+  el.className='pin-stub ic-ps';
+  el.dataset.pid=pid;
+  el.addEventListener('mousedown',onPinMD);
+  el.addEventListener('touchstart',onPinMD,{passive:false});
+  el.addEventListener('mouseenter',()=>el.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>el.classList.remove('hover'));
+  el.addEventListener('mouseup',onPinMU);
+  return el;
+}
+
+function onPinMD(e){
+  e.preventDefault(); e.stopPropagation();
+  if(isPanning||trimMode) return;
+  const pid=e.currentTarget.dataset.pid;
+  dragWire={from:pid,mx:0,my:0};
+  e.currentTarget.classList.add('dragging-src');
+  document.getElementById('statusBar').textContent='Dragging from '+pid+' — release on target pin';
+}
+
+function onPinMU(e){
+  if(!dragWire) return;
+  e.stopPropagation();
+  const tgt=e.currentTarget;
+  const srcEl=getPinEl(dragWire.from);
+  if(srcEl) srcEl.classList.remove('dragging-src');
+  const toPid=tgt.dataset.pid;
+  if(toPid && toPid!==dragWire.from){
+    const col=WIRE_COLORS[wColorIdx%WIRE_COLORS.length]; wColorIdx++;
+    const wire={from:dragWire.from,to:toPid,color:col};
+    wires.push(wire);
+    pushUndo({type:'addWire',wire,desc:'wire '+dragWire.from+' → '+toPid});
+    markConnected(); simulate(); renderLEDs();
+    document.getElementById('statusBar').textContent='Connected: '+dragWire.from+' → '+toPid;
+  }
+  dragWire=null; drawWires();
+}
+
+window.addEventListener('mouseup',e=>{
+  if(dragWire){
+    const srcEl=getPinEl(dragWire.from);
+    if(srcEl) srcEl.classList.remove('dragging-src');
+    dragWire=null; drawWires();
+    document.getElementById('statusBar').textContent='Drag from any pin to connect wires';
+  }
+});
+
+canvas.addEventListener('contextmenu',e=>{
+  if(trimMode){e.preventDefault();return;}
+  e.preventDefault();
+  const r=canvas.getBoundingClientRect();
+  const mx=e.clientX-r.left, my=e.clientY-r.top;
+  const hit=hitWire(mx,my);
+  if(hit>=0){
+    ctxWireIdx=hit;
+    const menu=document.getElementById('ctxMenu');
+    menu.style.display='block';
+    menu.style.left=(e.clientX+2)+'px';
+    menu.style.top=(e.clientY+2)+'px';
+  }
+});
+
+canvas.addEventListener('click',e=>{
+  if(!trimMode) return;
+  const r=canvas.getBoundingClientRect();
+  const hit=hitWire(e.clientX-r.left,e.clientY-r.top);
+  if(hit<0){
+    document.getElementById('statusBar').textContent='Trim mode ON - click directly on a wire to cut it';
+    return;
+  }
+  const removed=wires[hit];
+  wires.splice(hit,1);
+  pushUndo({type:'removeWire',wire:removed,desc:'trim wire'});
+  markConnected();
+  simulate();
+  renderLEDs();
+  drawWires();
+  document.getElementById('statusBar').textContent='Wire trimmed';
+});
+
+document.getElementById('ctxDelWire').onclick=()=>{
+  if(ctxWireIdx>=0){
+    const removed=wires[ctxWireIdx];
+    wires.splice(ctxWireIdx,1);
+    pushUndo({type:'removeWire',wire:removed,desc:'delete wire'});
+    ctxWireIdx=-1;markConnected();simulate();renderLEDs();
+  }
+  document.getElementById('ctxMenu').style.display='none';
+};
+document.getElementById('ctxCancel').onclick=()=>{document.getElementById('ctxMenu').style.display='none';};
+window.addEventListener('click',()=>{document.getElementById('ctxMenu').style.display='none';});
+
+function clearWires(){
+  if(wires.length) pushUndo({type:'clearWires',wires:[...wires],desc:'clear all wires'});
+  wires=[];markConnected();simulate();renderLEDs();drawWires();document.getElementById('statusBar').textContent='All wires cleared';
+}
+function clearAll(){
+  if(wires.length||ics.length) pushUndo({type:'clearAll',wires:[...wires],ics:[...ics],desc:'clear all'});
+  wires=[];ics=[];Object.keys(ffState).forEach(k=>delete ffState[k]);document.getElementById('icArea').innerHTML='';simulate();renderLEDs();
+}
+function togglePwr(){powered=!powered;document.getElementById('pwrBtn').classList.toggle('on',powered);simulate();renderLEDs();document.getElementById('statusBar').textContent=powered?'Power ON — circuit running':'Power OFF';}
+function toggleInput(i){inStates[i]=inStates[i]?0:1;simulate();renderLEDs();}
+
+function buildClkRow(){
+  const container=document.getElementById('clkPins');
+  container.innerHTML='';
+  container.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+  for(let i=0;i<N_CLK;i++){
+    const col=document.createElement('div');col.className='clk-col';
+    const lbl=document.createElement('span');lbl.className='clk-lbl';lbl.textContent='CLK '+i;
+    const ind=document.createElement('div');ind.className='clk-indicator';ind.id=`clkind${i}`;
+    const stub=makePinStub(`CLK_${i}`);
+    stub.style.background='#2ecc71';
+    const pbtn=document.createElement('button');
+    pbtn.className='clk-pulse-btn';
+    pbtn.title=`Manual pulse CLK ${i}`;
+    pbtn.innerHTML='⚡';
+    const pressClk=()=>{
+      if(clkRunning) return;
+      clkStates[i]=1;
+      renderClkIndicators();
+      simulate(); renderLEDs();
+    };
+    const releaseClk=()=>{
+      if(clkRunning) return;
+      clkStates[i]=0;
+      renderClkIndicators();
+      simulate(); renderLEDs();
+    };
+    pbtn.addEventListener('mousedown', pressClk);
+    pbtn.addEventListener('mouseup', releaseClk);
+    pbtn.addEventListener('mouseleave',releaseClk);
+    pbtn.addEventListener('touchstart', e=>{e.preventDefault();pressClk();});
+    pbtn.addEventListener('touchend', e=>{e.preventDefault();releaseClk();});
+    col.appendChild(lbl);
+    col.appendChild(ind);
+    col.appendChild(stub);
+    col.appendChild(pbtn);
+    container.appendChild(col);
+  }
+}
+
+function renderClkIndicators(){
+  for(let i=0;i<N_CLK;i++){
+    const el=document.getElementById(`clkind${i}`);
+    if(el) el.classList.toggle('hi',!!clkStates[i]);
+  }
+}
+
+function getClkHz(){
+  const v=parseInt(document.getElementById('clkFreqSlider').value,10);
+  return CLK_FREQS[Math.min(v,CLK_FREQS.length-1)];
+}
+
+function updateClkLabel(){
+  const hz=getClkHz();
+  document.getElementById('clkFreqLabel').textContent=hz>=1000?(hz/1000)+'kHz':hz+' Hz';
+}
+
+function tickClock(){
+  clkStates[0]=1;
+  renderClkIndicators();
+  simulate(); renderLEDs();
+  setTimeout(()=>{
+    if(!clkRunning) return;
+    clkStates[0]=0;
+    clkStates[1]=clkStates[1]?0:1;
+    if(clkStates[1]===0){
+      clkStates[2]=clkStates[2]?0:1;
+      if(clkStates[2]===0) clkStates[3]=clkStates[3]?0:1;
+    }
+    renderClkIndicators();
+    simulate(); renderLEDs();
+  }, Math.max(10, 500/getClkHz()));
+}
+
+function toggleClock(){
+  clkRunning=!clkRunning;
+  const btn=document.getElementById('clkRunBtn');
+  if(clkRunning){
+    const hz=getClkHz();
+    clkInterval=setInterval(tickClock,1000/(hz*2));
+    btn.textContent='⏹ Stop Auto';
+    btn.classList.add('running');
+    document.getElementById('statusBar').textContent='Auto-clock running — manual pulse disabled';
+  } else {
+    clearInterval(clkInterval);clkInterval=null;
+    clkStates=Array(N_CLK).fill(0);
+    renderClkIndicators();
+    simulate();renderLEDs();
+    btn.textContent='▶ Start Auto';
+    btn.classList.remove('running');
+    document.getElementById('statusBar').textContent='Auto-clock stopped — use ⚡ buttons for manual pulse';
+  }
+}
+
+document.getElementById('clkFreqSlider').addEventListener('input',()=>{
+  updateClkLabel();
+  if(clkRunning){
+    clearInterval(clkInterval);
+    const hz=getClkHz();
+    clkInterval=setInterval(tickClock,1000/(hz*2));
+    document.getElementById('statusBar').textContent='Clock: '+document.getElementById('clkFreqLabel').textContent;
+  }
+});
+
+function buildOutputRow(){
+  const row=document.getElementById('outRow'); row.innerHTML='';
+  for(let i=0;i<N_OUT;i++){
+    const col=document.createElement('div');col.className='pcol out-col';
+    const label=document.createElement('span');
+    label.className='pin-lbl';
+    label.textContent=i;
+    const bulbWrap=document.createElement('div');
+    bulbWrap.className='out-bulb-wrap';
+    const bulb=document.createElement('div');
+    bulb.className='out-bulb';
+    bulb.id=`obulb${i}`;
+    const base=document.createElement('div');
+    base.className='bulb-base';
+    const note=document.createElement('div');
+    note.className='out-note';
+    note.id=`onote${i}`;
+    note.textContent='OFF';
+    bulbWrap.appendChild(bulb);
+    bulbWrap.appendChild(base);
+    col.appendChild(label);
+    col.appendChild(bulbWrap);
+    col.appendChild(note);
+    col.appendChild(makePinStub(pinId('out',i,0)));
+    row.appendChild(col);
+  }
+  ['VCC','HIGH','LOW','GND'].forEach(t=>{
+    const col=document.createElement('div');col.className='pcol';
+    const colors={'VCC':'#f64','HIGH':'#f64','LOW':'#444','GND':'#333'};
+    const stub=makePinStub(t);
+    stub.style.background=colors[t]||'rgba(255,255,255,0.6)';
+    col.innerHTML=`<span class="pin-lbl" style="color:${t==='VCC'||t==='HIGH'?'#f64':t==='GND'?'#aaa':'#ccc'}">${t}</span>`;
+    col.appendChild(stub);
+    row.appendChild(col);
+  });
+
+  /* ── 7-Segment Display added right after GND ── Design & Developed  By Vishal Malage */
+  const seg7Wrap=document.createElement('div');
+  seg7Wrap.className='seg7-wrap';
+  seg7Wrap.innerHTML=`
+    <div class="seg7-box">
+      <svg class="seg7-svg" viewBox="0 0 50 80">
+        <!-- a --> <polygon id="seg_a" points="10,8  14,4  36,4  40,8  36,12 14,12" />
+        <!-- b --> <polygon id="seg_b" points="40,8  44,12 44,36 40,40 36,36 36,12" />
+        <!-- c --> <polygon id="seg_c" points="40,40 44,44 44,68 40,72 36,68 36,44" />
+        <!-- d --> <polygon id="seg_d" points="10,72 14,68 36,68 40,72 36,76 14,76" />
+        <!-- e --> <polygon id="seg_e" points="10,40 14,44 14,68 10,72 6,68  6,44" />
+        <!-- f --> <polygon id="seg_f" points="10,8  14,12 14,36 10,40 6,36  6,12" />
+        <!-- g --> <polygon id="seg_g" points="10,40 14,36 36,36 40,40 36,44 14,44" />
+        <!-- dp --> <circle id="seg_dp" cx="44" cy="74" r="3" />
+      </svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;color:#0ca5d7;font-weight:bold;text-align:center;">7-SEG DISPLAY</span>
+      <div class="seg7-pins" id="seg7PinRow"></div>
+    </div>
+  `;
+  row.appendChild(seg7Wrap);
+
+  const segPins=['a','b','c','d','e','f','g','dp'];
+  const pRow=seg7Wrap.querySelector('#seg7PinRow');
+  if(pRow){
+    segPins.forEach(p=>{
+      const col=document.createElement('div');
+      col.className='pcol';
+      col.style.minWidth='18px';
+      col.innerHTML=`<span class="pin-lbl" style="color:#0ca5d7;">${p}</span>`;
+      col.appendChild(makePinStub(`SEG7_${p}`));
+      pRow.appendChild(col);
+    });
+  }
+}
+
+function buildInputRow(){
+  const row=document.getElementById('inRow'); row.innerHTML='';
+  for(let i=0;i<N_IN;i++){
+    const col=document.createElement('div');col.className='pcol';
+    const stub=makePinStub(pinId('in',i,0));
+    const led=document.createElement('div');
+    led.className='led';
+    led.id=`iled${i}`;
+    const tog=document.createElement('button');
+    tog.className='toggle-sw'; tog.id=`itog${i}`;
+    tog.onclick=()=>toggleInput(i);
+    const label=document.createElement('span');
+    label.className='pin-lbl';
+    label.textContent=i;
+    col.appendChild(stub);
+    col.appendChild(led);
+    col.appendChild(tog);
+    col.appendChild(label);
+    row.appendChild(col);
+  }
+  ['GND','LOW','HIGH','VCC'].forEach(t=>{
+    const col=document.createElement('div');col.className='pcol';
+    const colors={'VCC':'#f64','HIGH':'#f64','LOW':'#444','GND':'#333'};
+    const stub=makePinStub(t);
+    stub.style.background=colors[t]||'rgba(255,255,255,0.6)';
+    col.innerHTML=`<span class="pin-lbl" style="color:${t==='VCC'||t==='HIGH'?'#f64':'#aaa'}">${t}</span>`;
+    col.appendChild(stub);
+    row.appendChild(col);
+  });
+}
+
+function pushUndo(action){
+  undoStack.push(action);
+  if(undoStack.length>50) undoStack.shift();
+  updateUndoBtn();
+}
+function updateUndoBtn(){
+  const btn=document.getElementById('undoBtn');
+  if(btn){btn.disabled=undoStack.length===0;btn.style.opacity=undoStack.length===0?'0.4':'1';}
+}
+function undoAction(){
+  if(!undoStack.length) return;
+  const action=undoStack.pop();
+  if(action.type==='addWire'){
+    wires=wires.filter(w=>w!==action.wire);
+  } else if(action.type==='removeWire'){
+    wires.push(action.wire);
+  } else if(action.type==='addIC'){
+    const el=document.getElementById(`icw${action.ic.id}`);
+    if(el) el.remove();
+    ics=ics.filter(x=>x.id!==action.ic.id);
+    wires=wires.filter(w=>!w.from.startsWith(`IC_${action.ic.id}_`)&&!w.to.startsWith(`IC_${action.ic.id}_`));
+  } else if(action.type==='removeIC'){
+    ics.push(action.ic);
+    action.removedWires.forEach(w=>wires.push(w));
+    buildIC(action.ic);
+  } else if(action.type==='clearWires'){
+    wires=action.wires;
+  } else if(action.type==='clearAll'){
+    wires=action.wires;
+    ics=action.ics;
+    ics.forEach(ic=>buildIC(ic));
+  }
+  markConnected(); simulate(); renderLEDs(); drawWires();
+  updateUndoBtn();
+  document.getElementById('statusBar').textContent='Undo: '+action.desc;
+}
+window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoAction();}});
+
+function addIC(){
+  const type=document.getElementById('icSel').value;
+  const def=IC_DEFS[type];
+  icCnt++;
+  const ic={id:icCnt,type,def,ps:{}};
+  ics.push(ic);
+  buildIC(ic);
+  pushUndo({type:'addIC',ic,desc:'add '+def.name});
+  simulate(); renderLEDs();
+  document.getElementById('statusBar').textContent='Added '+def.name;
+}
+
+function buildIC(ic){
+  const area=document.getElementById('icArea');
+  const def=ic.def; const n=def.pins; const half=n/2;
+  const wrap=document.createElement('div'); wrap.className='ic-wrap'; wrap.id=`icw${ic.id}`;
+  const del=document.createElement('button'); del.className='ic-del'; del.textContent='×';
+  del.title='Remove IC';
+  del.onclick=()=>{
+    const removedWires=wires.filter(w=>w.from.startsWith(`IC_${ic.id}_`)||w.to.startsWith(`IC_${ic.id}_`));
+    wires=wires.filter(w=>!w.from.startsWith(`IC_${ic.id}_`)&&!w.to.startsWith(`IC_${ic.id}_`));
+    ics=ics.filter(x=>x.id!==ic.id);
+    document.getElementById(`icw${ic.id}`).remove();
+    Object.keys(ffState).filter(k=>k.startsWith(ic.id+'_')).forEach(k=>delete ffState[k]);
+    pushUndo({type:'removeIC',ic,removedWires,desc:'remove '+ic.def.name});
+    markConnected(); simulate(); renderLEDs(); drawWires();
+  };
+  wrap.appendChild(del);
+  const notch=document.createElement('div'); notch.className='ic-notch'; wrap.appendChild(notch);
+  const chip=document.createElement('div'); chip.className='ic-chip';
+  const colL=document.createElement('div'); colL.className='ic-col-l';
+  const colR=document.createElement('div'); colR.className='ic-col-r';
+  const sL=document.createElement('div'); sL.className='ic-sidebar';
+  const sR=document.createElement('div'); sR.className='ic-sidebar';
+  const body=document.createElement('div'); body.className='ic-body';
+  const lbl=document.createElement('div'); lbl.className='ic-lbl'; lbl.textContent=def.name;
+  body.appendChild(lbl);
+  for(let i=0;i<half;i++){
+    const pL=i+1, pR=n-i;
+    sL.innerHTML+=`<div class="h"></div>`;
+    sR.innerHTML+=`<div class="h"></div>`;
+    const rL=document.createElement('div'); rL.className='ic-pin-row';
+    const nL=document.createElement('span'); nL.className='pn'; nL.textContent=pL;
+    rL.appendChild(nL); rL.appendChild(makePinStub(pinId('ic',ic.id,pL)));
+    colL.appendChild(rL);
+    const rR=document.createElement('div'); rR.className='ic-pin-row r';
+    const nR=document.createElement('span'); nR.className='pn r'; nR.textContent=pR;
+    rR.appendChild(nR); rR.appendChild(makePinStub(pinId('ic',ic.id,pR)));
+    colR.appendChild(rR);
+  }
+  chip.appendChild(colL); chip.appendChild(sL); chip.appendChild(body); chip.appendChild(sR); chip.appendChild(colR);
+  wrap.appendChild(chip); area.appendChild(wrap);
+}
+
+window.addEventListener('resize',()=>{resizeCanvas();drawWires();});
+buildOutputRow();
+buildInputRow();
+buildClkRow();
+updateClkLabel();
+applyTransform();
+updateTrimUi();
+updateUndoBtn();
+setTimeout(()=>{resizeCanvas();drawWires();},100);
+</script>
+
+</body>
+</html>
