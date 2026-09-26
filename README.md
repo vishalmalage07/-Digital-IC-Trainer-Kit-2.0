@@ -1,5 +1,5 @@
 <h1 align="center">Hi 👋, I'm Vishal Malage</h1>
-<h3 align="center">A passionate Web Developer And Lecturer From India 🇮🇳 Building Tools For Accessible Education</h3>
+<h3 align="center">A passionate Web Developer And Lecturer From India Building Tools For Accessible Education</h3>
 
 <p align="center">
   <a href="https://linkedin.com/in/vishal-malage" target="_blank">
